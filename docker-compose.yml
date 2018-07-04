@@ -1,0 +1,39 @@
+version: '3'
+services:
+  openfire:
+    image: gizmotronic/openfire:4.2.3
+    ports:
+      - "9090:9090/tcp"
+      - "9091:9091/tcp"
+      - "5222:5222/tcp"
+      - "7777:7777/tcp"
+    volumes:
+      - ${PWD}/volumes/openfire/data:/var/lib/openfire
+      - ${PWD}/volumes/openfire/logs:/var/log/openfire
+    links:
+      - db:database_srv
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: r00t
+      MYSQL_DATABASE: openfire_db
+      MYSQL_USER: openfire_db_user
+      MYSQL_PASSWORD: s3cr3t
+    ports:
+      - "3306:3306/tcp"
+    
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    links:
+      - db:database_srv
+volumes:
+  db_data:
