@@ -22,6 +22,17 @@ $ docker-compose up
 * MySQL Adminer > http://localhost:8080 
 * MySQL Server > localhost:3306
 
+## Openfire
+Use this db settings in openfire initial setup:
+* jdbc:mysql://database_srv:3306/openfire_db?rewriteBatchedStatements=true 
+* user: openfire_db_user
+* pwd: s3cr3t
+
+## MySQL
+Server exposes port 3306 to host with this credentials:
+* user: root
+* pwd: r00t
+
 ## Destroy Stack
 ```bash
 $ docker-compose stop
