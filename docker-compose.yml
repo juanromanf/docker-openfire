@@ -8,8 +8,8 @@ services:
       - "5222:5222/tcp"
       - "7777:7777/tcp"
     volumes:
-      - ${PWD}/volumes/openfire/data:/var/lib/openfire
-      - ${PWD}/volumes/openfire/logs:/var/log/openfire
+      - of_data:/var/lib/openfire
+      - of_logs:/var/log/openfire
     links:
       - db:database_srv
     depends_on:
@@ -37,3 +37,5 @@ services:
       - db:database_srv
 volumes:
   db_data:
+  of_data:
+  of_logs:
