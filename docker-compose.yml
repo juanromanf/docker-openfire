@@ -1,15 +1,25 @@
 version: '3'
 services:
-  openfire:
+  openfire:    
     image: gizmotronic/openfire:4.2.3
+    restart: unless-stopped
     ports:
       - "9090:9090/tcp"
       - "9091:9091/tcp"
       - "5222:5222/tcp"
       - "7777:7777/tcp"
+      - "7070:7070/tcp"
+    ulimits:
+      nproc: 409600
+      nofile: 819200        
+    sysctls:
+      net.core.somaxconn: 1024      
     volumes:
       - of_data:/var/lib/openfire
       - of_logs:/var/log/openfire
+    environment:
+      TZ: "America/Bogota"
+      DAEMON_OPTS: -Xms32m -Xmx128m -Xss128k -Xoss128k -XX:ThreadStackSize=128 -XX:+PrintGCDetails -Xloggc:/var/log/openfire/gc.log -XX:+HeapDumpOnOutOfMemoryError
     links:
       - db:database_srv
     depends_on:
@@ -17,10 +27,11 @@ services:
 
   db:
     image: mysql:5.7
-    restart: always
+    restart: unless-stopped
     volumes:
       - db_data:/var/lib/mysql
     environment:
+      TZ: "America/Bogota"
       MYSQL_ROOT_PASSWORD: r00t
       MYSQL_DATABASE: openfire_db
       MYSQL_USER: openfire_db_user
@@ -30,12 +41,30 @@ services:
     
   adminer:
     image: adminer
-    restart: always
+    restart: unless-stopped
+    environment:
+      TZ: "America/Bogota"
     ports:
       - 8080:8080
     links:
       - db:database_srv
+
 volumes:
   db_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${OF_STACK_DIRECTORY}/mysql-data
+      o: bind
   of_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${OF_STACK_DIRECTORY}/openfire-data
+      o: bind
   of_logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${OF_STACK_DIRECTORY}/logs/
+      o: bind
