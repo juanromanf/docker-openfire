@@ -11,12 +11,10 @@ services:
       - "7070:7070/tcp"
     ulimits:
       nproc: 409600
-      nofile: 819200        
-    sysctls:
-      net.core.somaxconn: 1024      
+      nofile: 819200
     volumes:
-      - of_data:/var/lib/openfire
-      - of_logs:/var/log/openfire
+      - ./openfire-data:/var/lib/openfire
+      - ./logs:/var/log/openfire
     environment:
       TZ: "America/Bogota"
       DAEMON_OPTS: -Xms32m -Xmx128m -Xss128k -Xoss128k -XX:ThreadStackSize=128 -XX:+PrintGCDetails -Xloggc:/var/log/openfire/gc.log -XX:+HeapDumpOnOutOfMemoryError
@@ -29,7 +27,7 @@ services:
     image: mysql:5.7
     restart: unless-stopped
     volumes:
-      - db_data:/var/lib/mysql
+      - ./mysql-data:/var/lib/mysql
     environment:
       TZ: "America/Bogota"
       MYSQL_ROOT_PASSWORD: r00t
@@ -48,23 +46,3 @@ services:
       - 8080:8080
     links:
       - db:database_srv
-
-volumes:
-  db_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${OF_STACK_DIRECTORY}/mysql-data
-      o: bind
-  of_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${OF_STACK_DIRECTORY}/openfire-data
-      o: bind
-  of_logs:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${OF_STACK_DIRECTORY}/logs/
-      o: bind
