@@ -19,7 +19,7 @@ $ docker-compose up
 
 ## Services
 * Openfire Admin Console > http://localhost:9090 
-* MySQL Adminer > http://localhost:8080 
+* phpMyAdmin > http://localhost:9000 
 * MySQL Server > localhost:3306
 
 ## Openfire

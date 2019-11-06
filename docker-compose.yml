@@ -1,21 +1,45 @@
-version: '3.1'
+version: '3'
+
 services:
+  
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: "unless-stopped"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      TZ: "America/Bogota"
+      MYSQL_ROOT_PASSWORD: r00t
+      MYSQL_DATABASE: chat
+      MYSQL_USER: chat_user
+      MYSQL_PASSWORD: Cha+DBu5er
+    ports:
+      - "3306:3306/tcp"
+    
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: "unless-stopped"
+    ports:
+      - '9000:80'
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: r00t 
+
   openfire:
-    build: build/openfire
-    image: openfire-dev
-    restart: unless-stopped
+    build: ./build/openfire-v4.3.2
+    image: openfire:4.3.2
+    restart: "no"
     ports:
       - "9090:9090/tcp"
       - "9091:9091/tcp"
       - "5222:5222/tcp"
       - "7777:7777/tcp"
       - "7070:7070/tcp"
-    ulimits:
-      nproc: 409600
-      nofile: 819200
     volumes:
-      - ./openfire-data:/var/lib/openfire
-      - ./logs:/var/log/openfire
+      - openfire-data:/var/lib/openfire
     environment:
       TZ: "America/Bogota"
       DAEMON_OPTS: -Xms32m -Xmx128m -Xss128k -Xoss128k -XX:ThreadStackSize=128 -XX:+PrintGCDetails -Xloggc:/var/log/openfire/gc.log -XX:+HeapDumpOnOutOfMemoryError
@@ -24,27 +48,7 @@ services:
     depends_on:
       - db
 
-  db:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
-    restart: unless-stopped
-    volumes:
-      - ./mysql-data:/var/lib/mysql
-    environment:
-      TZ: "America/Bogota"
-      MYSQL_ROOT_PASSWORD: r00t
-      MYSQL_DATABASE: openfire_db
-      MYSQL_USER: openfire_db_user
-      MYSQL_PASSWORD: s3cr3t
-    ports:
-      - "3306:3306/tcp"
-    
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    environment:
-      TZ: "America/Bogota"
-    ports:
-      - 8080:8080
-    links:
-      - db:database_srv
+
+volumes:
+  mysql-data:
+  openfire-data:
